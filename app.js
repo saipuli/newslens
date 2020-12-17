@@ -10,7 +10,7 @@ feednami.load(url).then((feed) => {
   for (let entry of feed.entries.slice(feed.entries, 12)) {
     //create a list element
     let li = document.createElement("div");
-    li.className = "min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800";
+    li.className = "py-6";
     let stripper = document.createElement("div");
     stripper.innerHTML = entry.description;
     let textContent = stripper.textContent || stripper.innerText || "";
@@ -32,13 +32,15 @@ feednami.load(url).then((feed) => {
     }
 
     const cardHtml = `
-               <h4 class="mb-4 font-semibold text-gray-600 dark:text-gray-300">
-               <a href="${entry.link}">${entry.title}</a>
-               </h4>
-               ${firstImage.outerHTML}
-               <p class="text-gray-600 dark:text-gray-400">
-                ${textContent}
-               </p>`;
+    <div class="flex max-w-md bg-white shadow-lg rounded-lg overflow-hidden">
+      <div class="w-1/3 bg-cover" 
+        style="background-image: url('${imgSrc}')">
+      </div> 
+      <div class="w-2/3 p-4">
+        <h3 class="text-gray-900 font-bold"><a href="${entry.link}">${entry.title}</a></h3>
+        <p class="mt-2 text-gray-600 text-sm">${textContent}</p>
+      </div>
+    </div>`;
 
     //add HTML content to list items
     // li.innerHTML = `<h4><a href="${entry.link}">${entry.title}</a></h4><p>${entry.description}</p>`;
@@ -47,9 +49,3 @@ feednami.load(url).then((feed) => {
     textarea.appendChild(li);
   }
 });
-
-//Using feednami to fetch RSS feeds
-//https://toolkit.sekando.com/docs/en/feednami
-
-//Feeds from BBC News
-//https://www.bbc.com/news/10628494#userss

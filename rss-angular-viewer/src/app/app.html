@@ -1,0 +1,145 @@
+<div class="container">
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 15.5c-3.59 0-6.5-2.91-6.5-6.5S8.41 5.5 12 5.5s6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5zM12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+          </svg>
+        </div>
+        <h1>NewsLens</h1>
+      </div>
+      <div class="date-badge">
+        {{ currentDate() }}
+      </div>
+    </div>
+
+    <!-- Toolbar: Search and Custom Loaders -->
+    <div class="toolbar">
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Filter stories by title or description..." 
+          class="search-input"
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event)"
+        >
+      </div>
+
+      <!-- Custom Feed URL Input -->
+      <div class="custom-loader">
+        <input 
+          type="text" 
+          placeholder="Enter RSS feed URL..." 
+          class="url-input"
+          [ngModel]="customUrlInput()" 
+          (ngModelChange)="customUrlInput.set($event)"
+          (keyup.enter)="loadCustomFeed()"
+        >
+        <button class="btn-load" (click)="loadCustomFeed()">Load Feed</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Feed Presets Tabs -->
+  <div class="presets-container">
+    @for (preset of presets(); track preset.url) {
+      <div 
+        class="preset-chip" 
+        [class.active]="currentFeedUrl() === preset.url"
+        (click)="loadFeed(preset.url)"
+      >
+        @if (preset.logo) {
+          <img [src]="preset.logo" [alt]="preset.name" class="preset-logo" onerror="this.style.display='none'">
+        }
+        <span>{{ preset.name }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="cards-grid">
+      @for (i of [1,2,3,4,5,6,7,8]; track i) {
+        <div class="card skeleton-card">
+          <div class="card-image-wrap skeleton-img"></div>
+          <div class="card-content">
+            <div class="card-meta">
+              <div class="skeleton-text" style="width: 1.25rem; height: 1.25rem; border-radius: 50%;"></div>
+              <div class="skeleton-text" style="width: 4rem;"></div>
+            </div>
+            <div class="skeleton-text skeleton-title" style="width: 90%;"></div>
+            <div class="skeleton-text skeleton-title" style="width: 75%;"></div>
+            <div class="skeleton-text skeleton-desc" style="width: 100%; margin-top: 0.5rem;"></div>
+            <div class="skeleton-text skeleton-desc" style="width: 95%;"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- Error State -->
+    @if (errorMessage()) {
+      <div class="error-card">
+        <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <div>{{ errorMessage() }}</div>
+      </div>
+    }
+
+    <!-- Feed Header Meta Card -->
+    @if (feedMeta()) {
+      <div class="feed-info-card">
+        @if (feedMeta()?.image) {
+          <div class="feed-image-container">
+            <img [src]="feedMeta()?.image" [alt]="feedMeta()?.title" class="feed-img" onerror="this.parentElement.style.display='none'">
+          </div>
+        }
+        <div class="feed-details">
+          <h2 class="feed-title">{{ feedMeta()?.title }}</h2>
+          @if (feedMeta()?.description) {
+            <p class="feed-desc">{{ feedMeta()?.description }}</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Articles Grid -->
+    <div class="cards-grid">
+      @for (item of filteredItems(); track item.guid || item.link; let i = $index) {
+        <a [href]="getSafeUrl(item.link)" target="_blank" class="card-anchor">
+          <div class="card">
+            <div class="card-image-wrap">
+              <img [src]="getArticleImage(item)" [alt]="item.title" class="card-img" [loading]="i < 2 ? 'eager' : 'lazy'">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                @if (feedMeta()?.image) {
+                  <img [src]="feedMeta()?.image" class="meta-logo" alt="feed source logo" onerror="this.style.display='none'">
+                }
+                <span class="meta-date">{{ formatArticleDate(item.pubDate) }}</span>
+              </div>
+              <h3 class="card-title">{{ item.title }}</h3>
+              @if (getCleanDescription(item)) {
+                <p class="card-desc">{{ getCleanDescription(item) }}</p>
+              }
+            </div>
+          </div>
+        </a>
+      } @empty {
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+          </svg>
+          <h3 class="empty-title">No articles match your search</h3>
+          <p class="empty-desc">Try modifying your search term or selecting a different RSS feed.</p>
+        </div>
+      }
+    </div>
+  }
+</div>

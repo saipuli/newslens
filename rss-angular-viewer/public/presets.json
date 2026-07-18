@@ -1,0 +1,26 @@
+[
+  {
+    "name": "India Today",
+    "url": "https://www.indiatoday.in/rss/1206578",
+    "category": "National",
+    "logo": "https://www.indiatoday.in/favicon.ico"
+  },
+  {
+    "name": "BBC News",
+    "url": "https://feeds.bbci.co.uk/news/rss.xml",
+    "category": "World",
+    "logo": "https://www.bbc.co.uk/favicon.ico"
+  },
+  {
+    "name": "Wired",
+    "url": "https://www.wired.com/feed/rss",
+    "category": "Science & Tech",
+    "logo": "https://www.wired.com/favicon.ico"
+  },
+  {
+    "name": "NYT Home",
+    "url": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    "category": "World",
+    "logo": "https://www.nytimes.com/favicon.ico"
+  }
+]

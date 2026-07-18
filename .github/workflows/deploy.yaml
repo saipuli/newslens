@@ -1,0 +1,36 @@
+name: Build and Deploy Angular to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Change to master if your default branch is master
+
+permissions:
+  contents: write # Crucial permission allowing the runner to push to your gh-pages branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Match this to your local Node version if needed
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Application
+        # Replace 'your-repository-name' with your actual repository name
+        run: ./node-node_modules/.bin/ng build --configuration production --base-href /rss-angular-viewer/
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist/rss-angular-viewer/browser # Check your local dist folder structure to match your exact output path
+          branch: gh-pages

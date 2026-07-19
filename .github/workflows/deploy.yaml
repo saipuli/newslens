@@ -33,14 +33,14 @@ jobs:
         run: npm ci
 
       - name: Build Application
-        # Replace 'your-repository-name' with your actual repository name
+        id: build_angular
         run: npm run build --configuration=production
 
       - name: Upload Static Website Artifact (Latest v5)
         uses: actions/upload-pages-artifact@v5
         with:
           # Match your exact local Angular 17+ dist output folder path
-          path: dist/rss-angular-viewer/browser
+          path: '${{ steps.build_angular.outputs.location }}/browser/'
 
   deploy:
     needs: build

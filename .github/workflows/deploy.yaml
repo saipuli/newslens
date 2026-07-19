@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    working-directory: ./rss-angular-viewer
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -31,7 +32,7 @@ jobs:
 
       - name: Build Application
         # Replace 'your-repository-name' with your actual repository name
-        run: ./node_modules/.bin/ng build --configuration production --base-href /rss-angular-viewer/
+        run: npm run build --configuration=production
 
       - name: Upload Static Website Artifact (Latest v5)
         uses: actions/upload-pages-artifact@v5

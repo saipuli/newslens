@@ -1,36 +1,51 @@
-name: Build and Deploy Angular to GitHub Pages
+name: Build and Deploy Angular Native to GitHub Pages
 
 on:
   push:
     branches:
-      - main # Change to master if your default branch is master
+      - master
 
 permissions:
-  contents: write # Crucial permission allowing the runner to push to your gh-pages branch
+  contents: read    # Minimum layout access to read codebase
+  pages: write       # Essential infrastructure access to modify GitHub Pages
+  id-token: write    # OpenID Connect (OIDC) token capability for direct server deployment
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true # Cancels old deployments if you push updates rapidly
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '20' # Match this to your local Node version if needed
-          cache: 'npm'
+          node-version: '24'
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Build Application
         # Replace 'your-repository-name' with your actual repository name
-        run: ./node-node_modules/.bin/ng build --configuration production --base-href /rss-angular-viewer/
+        run: ./node_modules/.bin/ng build --configuration production --base-href /rss-angular-viewer/
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload Static Website Artifact (Latest v5)
+        uses: actions/upload-pages-artifact@v5
         with:
-          folder: dist/rss-angular-viewer/browser # Check your local dist folder structure to match your exact output path
-          branch: gh-pages
+          # Match your exact local Angular 17+ dist output folder path
+          path: dist/rss-angular-viewer/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Direct to GitHub Pages Infrastructure (Latest v5)
+        id: deployment
+        uses: actions/deploy-pages@v5

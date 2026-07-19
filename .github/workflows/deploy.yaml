@@ -17,7 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    working-directory: ./rss-angular-viewer
+    defaults:
+      run:
+        working-directory: ./your-sub-directory-name
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -43,6 +45,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./your-sub-directory-name
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

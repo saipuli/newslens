@@ -61,8 +61,8 @@ export class RssService {
 
   // Fetches XML wrapped in JSON via CORS proxy and parses client-side
   getFeed(feedUrl: string): Observable<RssResponse> {
-    const url = `${this.proxyUrl}${encodeURIComponent(feedUrl)}`;
-    return this.http.get<AllOriginsResponse>(url).pipe(
+    // const url = `${this.proxyUrl}${encodeURIComponent(feedUrl)}`;
+    return this.http.get<AllOriginsResponse>(feedUrl).pipe(
       map(response => this.parseRssXml(response.contents, feedUrl))
     );
   }

@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./your-sub-directory-name
+        working-directory: rss-angular-viewer
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./your-sub-directory-name
+        working-directory: ./rss-angular-viewer
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -37,10 +37,12 @@ jobs:
         run:  |
           # Run your normal build command
           npm run build -- --configuration=production
-          
+          pwd
+          ls -la dist/rss-angular-viewer/browser
           # Step 2: Use standard bash/pwd to find the compiled path dynamically.
           # We search inside the local 'dist' folder for your project name.
-          PROJECT_DIST_PATH=$(find browser -maxdepth 3 -mindepth 1 -type d)
+          PROJECT_DIST_PATH=$(pwd)/dist/rss-angular-viewer/browser
+          echo "Project build path: $PROJECT_DIST_PATH"
           
           # Step 3: Write it to the $GITHUB_OUTPUT environment file
           echo "build_path=${PROJECT_DIST_PATH}" >> $GITHUB_OUTPUT
@@ -49,7 +51,7 @@ jobs:
         uses: actions/upload-pages-artifact@v5
         with:
           # Match your exact local Angular 17+ dist output folder path
-          path: '${{ steps.build_angular.outputs.build_path }}'
+          path: ${{ steps.build_angular.outputs.build_path }}
 
   deploy:
     needs: build
